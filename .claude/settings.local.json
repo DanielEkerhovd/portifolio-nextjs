@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run dev)",
+      "Bash(taskkill /PID 37560 /F)",
+      "Bash(taskkill //PID 37560 //F)",
+      "Bash(taskkill //PID 24500 //F)",
+      "Bash(curl -v http://localhost:3000)",
+      "WebFetch(domain:fonts.googleapis.com)",
+      "Bash(curl -sL \"https://fonts.gstatic.com/s/mirandasans/v3/aFTG7Pt8ZWk4XsiWhk7Rb_e3Y6UIjsX0vr9-ZHGmD8w.ttf\" -o \"c:/Coding/private/portifolio/fonts/MirandaSans-Regular.ttf\")",
+      "Bash(curl -sL \"https://fonts.gstatic.com/s/mirandasans/v3/aFTG7Pt8ZWk4XsiWhk7Rb_e3Y6UIjsX0vr9-ZEOmD8w.ttf\" -o \"c:/Coding/private/portifolio/fonts/MirandaSans-Medium.ttf\")",
+      "Bash(curl -sL \"https://fonts.gstatic.com/s/mirandasans/v3/aFTG7Pt8ZWk4XsiWhk7Rb_e3Y6UIjsX0vr9-ZK-hD8w.ttf\" -o \"c:/Coding/private/portifolio/fonts/MirandaSans-SemiBold.ttf\")",
+      "Bash(curl -sL \"https://fonts.gstatic.com/s/mirandasans/v3/aFTG7Pt8ZWk4XsiWhk7Rb_e3Y6UIjsX0vr9-ZJahD8w.ttf\" -o \"c:/Coding/private/portifolio/fonts/MirandaSans-Bold.ttf\")",
+      "Bash(npm install react-icons)"
+    ]
+  }
+}
