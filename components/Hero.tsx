@@ -58,7 +58,7 @@ export default function Hero({
 
   const revealTransition = isExpanded
     ? `grid-template-rows 0.4s ${cubic} 0.2s, opacity 0.35s ${cubic} 0.3s`
-    : `grid-template-rows 0.2s ${cubic}, opacity 0.15s ${cubic}`;
+    : `opacity 0.35s ${cubic}, grid-template-rows 0.4s ${cubic} 0.05s`;
 
   return (
     <section
