@@ -116,7 +116,6 @@ const flexTransition = "flex-grow 0.35s cubic-bezier(0.25, 0.1, 0.25, 1)";
 
 interface ProjectsProps {
   isExpanded: boolean;
-  isCollapsed: boolean;
   onClick: () => void;
   onClose: () => void;
   onHoverStart: () => void;
@@ -126,7 +125,6 @@ interface ProjectsProps {
 
 export default function Projects({
   isExpanded,
-  isCollapsed,
   onClick,
   onClose,
   onHoverStart,
@@ -139,9 +137,7 @@ export default function Projects({
       onMouseEnter={onHoverStart}
       onMouseLeave={onHoverEnd}
       style={{ flexGrow: flex, flexShrink: 0, flexBasis: 0, transition: flexTransition }}
-      className={`w-full bg-foreground/70 backdrop-blur-xl border border-secondary/30 shadow-lg rounded-sm flex items-center justify-center relative cursor-pointer overflow-hidden
-        ${isCollapsed ? "opacity-90 hover:opacity-100" : ""}
-      `}
+      className="w-full bg-foreground/70 backdrop-blur-xl border border-secondary/30 shadow-lg rounded-sm flex items-center justify-center relative cursor-pointer overflow-hidden"
     >
       {isExpanded && (
         <button
@@ -162,15 +158,8 @@ export default function Projects({
         </div>
       )}
 
-      {/* === COLLAPSED STATE === */}
-      {isCollapsed && (
-        <div>
-          <p className="text-xs font-semibold">Projects</p>
-        </div>
-      )}
-
-      {/* === DEFAULT STATE === */}
-      {!isExpanded && !isCollapsed && (
+      {/* === DEFAULT / COLLAPSED STATE === */}
+      {!isExpanded && (
         <div className="w-full h-full p-5 flex flex-col items-center overflow-hidden">
           <h3 className="font-semibold text-secondary uppercase tracking-wider self-start ml-5 mb-5">
             Projects

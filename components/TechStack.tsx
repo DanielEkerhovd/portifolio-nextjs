@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { motion, AnimatePresence } from "motion/react";
 
 const cubic = "cubic-bezier(0.25, 0.1, 0.25, 1)";
@@ -22,6 +22,7 @@ import {
   HiOutlineClipboardDocumentList,
   HiOutlineUserGroup,
 } from "react-icons/hi2";
+import { LuMousePointer2 } from "react-icons/lu";
 
 import { TbVinyl } from "react-icons/tb";
 
@@ -153,35 +154,40 @@ const otherSkills: SkillItem[] = [
 
 function Timeline({ items }: { items: Milestone[] }) {
   return (
-    <div className="w-full overflow-hidden px-4 py-2">
-      <div className="relative flex items-start gap-0">
+    <div className="w-full px-4 py-4">
+      <div className="relative flex items-stretch gap-2">
         {/* Horizontal line */}
-        <div className="absolute top-[7px] left-4 right-4 h-px bg-secondary/30" />
+        <div className="absolute top-3.75 left-4 right-4 h-px bg-secondary/30" />
 
         {items.map((m, i) => (
           <motion.div
             key={`${m.year}-${m.title}`}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: i * 0.08 }}
-            className="relative flex flex-col items-center flex-1 min-w-[120px]"
+            whileHover={{ scale: 1.07 }}
+            transition={{
+              opacity: { duration: 0.3, delay: 0.35 + i * 0.08 },
+              y: { duration: 0.3, delay: 0.35 + i * 0.08 },
+              scale: { type: "spring", stiffness: 300, damping: 22 },
+            }}
+            className="group relative flex flex-col items-center flex-1 w-0 rounded-lg px-2 py-2 hover:bg-secondary hover:border-secondary/40 hover:shadow-lg hover:z-10 border border-transparent transition-colors duration-200"
           >
             {/* Dot */}
             <div className="relative w-3.5 h-3.5 z-10 shrink-0">
               {m.year === "2024 - Now" && (
-                <span className="absolute inset-0 rounded-full bg-secondary animate-ping opacity-60" />
+                <span className="absolute inset-0 rounded-full bg-secondary group-hover:bg-white animate-ping opacity-60 transition-colors duration-200" />
               )}
-              <div className="w-full h-full rounded-full bg-secondary border-2 border-foreground/70" />
+              <div className="w-full h-full rounded-full bg-secondary group-hover:bg-white border-2 border-foreground/70 group-hover:border-secondary/40 transition-colors duration-200" />
             </div>
 
             {/* Content */}
-            <span className="text-[0.7rem] font-semibold text-secondary mt-2">
+            <span className="text-[0.7rem] font-semibold text-secondary group-hover:text-white mt-2 transition-colors duration-200">
               {m.year}
             </span>
-            <span className="text-xs font-medium text-text/80 mt-0.5 whitespace-nowrap">
+            <span className="text-xs font-medium text-text/80 group-hover:text-white/90 mt-0.5 text-center leading-tight transition-colors duration-200">
               {m.title}
             </span>
-            <span className="text-[0.6rem] text-text/50 font-light mt-0.5 max-w-[100px]  leading-tight border-l-secondary border-l-1 pl-2">
+            <span className="text-[0.6rem] text-text/50 group-hover:text-white/70 font-light mt-0.5 max-w-25 leading-tight border-l border-l-secondary group-hover:border-l-white/40 pl-2 transition-colors duration-200">
               {m.description}
             </span>
           </motion.div>
@@ -302,6 +308,7 @@ interface TechStackProps {
   isExpanded: boolean;
   isCollapsed: boolean;
   collapseAxis: "horizontal" | "vertical" | null;
+  isHeroExpanded: boolean;
   onClick: () => void;
   onClose: () => void;
   onHoverStart: () => void;
@@ -313,6 +320,7 @@ export default function TechStack({
   isExpanded,
   isCollapsed,
   collapseAxis,
+  isHeroExpanded,
   onClick,
   onClose,
   onHoverStart,
@@ -322,6 +330,26 @@ export default function TechStack({
   const isHCollapse = isCollapsed && collapseAxis === "horizontal";
   const isVCollapse = isCollapsed && collapseAxis === "vertical";
   const [activeSkill, setActiveSkill] = useState<string | null>(null);
+  const [showHint, setShowHint] = useState(false);
+
+  useEffect(() => {
+    if (!isHeroExpanded) {
+      setShowHint(false);
+      return;
+    }
+    if (localStorage.getItem("tech-hint-seen")) return;
+    const timer = setTimeout(() => setShowHint(true), 5000);
+    return () => clearTimeout(timer);
+  }, [isHeroExpanded]);
+
+  useEffect(() => {
+    if (isExpanded) {
+      localStorage.setItem("tech-hint-seen", "1");
+      setShowHint(false);
+    }
+  }, [isExpanded]);
+
+  const hintVisible = showHint && !isExpanded;
 
   const toggleSkill = (label: string) => {
     setActiveSkill((prev) => (prev === label ? null : label));
@@ -558,14 +586,98 @@ export default function TechStack({
         </div>
       </div>
 
+      {/* Tech hint — click animation, shown when Hero is focused */}
+      <style>{`
+        @keyframes ts-click-pointer {
+          0%, 62%  { transform: scale(1); }
+          68%      { transform: scale(0.72); }
+          75%      { transform: scale(1); }
+          100%     { transform: scale(1); }
+        }
+        @keyframes ts-click-circle {
+          0%, 68%  { transform: scale(0); opacity: 0; }
+          70%      { opacity: 1; transform: scale(0.2); }
+          84%      { opacity: 0; transform: scale(2.2); }
+          100%     { opacity: 0; }
+        }
+        @keyframes ts-click-shoot {
+          0%, 76%  { opacity: 0; transform: translateX(4px) scaleX(0); }
+          80%      { opacity: 1; transform: translateX(6px) scaleX(0.4); }
+          97%      { opacity: 0; transform: translateX(14px) scaleX(1); }
+          100%     { opacity: 0; }
+        }
+      `}</style>
+      <div
+        className="absolute bottom-4 left-0 right-0 flex items-center justify-center gap-3 pointer-events-none"
+        style={{
+          opacity: hintVisible ? 1 : 0,
+          transform: hintVisible ? "translateY(0)" : "translateY(8px)",
+          transition: "opacity 0.6s ease, transform 0.6s ease",
+        }}
+      >
+        <span className="text-secondary text-xs tracking-widest uppercase font-medium whitespace-nowrap">
+          My journey and skills
+        </span>
+        <div className="relative flex items-center justify-center w-10 h-10 text-secondary">
+          <span className="absolute" style={{ top: "32%", left: "32%" }}>
+            <span
+              className="absolute rounded-full border border-current"
+              style={{
+                width: 8,
+                height: 8,
+                marginLeft: -4,
+                marginTop: -4,
+                animationName: "ts-click-circle",
+                animationDuration: "2.4s",
+                animationTimingFunction: "ease-out",
+                animationIterationCount: "infinite",
+              }}
+            />
+            {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
+              <span
+                key={angle}
+                className="absolute"
+                style={{ transform: `rotate(${angle}deg)`, transformOrigin: "0 0" }}
+              >
+                <span
+                  className="absolute"
+                  style={{
+                    width: 6,
+                    height: 1.5,
+                    borderRadius: 1,
+                    background: "currentColor",
+                    transformOrigin: "left center",
+                    animationName: "ts-click-shoot",
+                    animationDuration: "2.4s",
+                    animationTimingFunction: "ease-out",
+                    animationIterationCount: "infinite",
+                  }}
+                />
+              </span>
+            ))}
+          </span>
+          <span
+            className="relative z-10"
+            style={{
+              animationName: "ts-click-pointer",
+              animationDuration: "2.4s",
+              animationTimingFunction: "ease-in-out",
+              animationIterationCount: "infinite",
+            }}
+          >
+            <LuMousePointer2 size={20} />
+          </span>
+        </div>
+      </div>
+
       {/* Timeline — expanded only */}
       {isExpanded && (
         <div className="w-full px-8 pb-6">
           <motion.h3
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.2, delay: 0.2 }}
-            className="font-semibold uppercase tracking-wider text-secondary text-xs mb-3"
+            transition={{ duration: 0.2, delay: 0.35 }}
+            className="font-semibold uppercase tracking-wider text-secondary text-xs mb-1"
           >
             Journey
           </motion.h3>

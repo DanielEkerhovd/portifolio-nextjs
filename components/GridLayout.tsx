@@ -97,6 +97,7 @@ export default function GridLayout() {
           isExpanded={isExpanded("tech-stack")}
           isCollapsed={isCollapsed("tech-stack")}
           collapseAxis={activeCard === "hero" ? "horizontal" : activeCard === "projects" ? "vertical" : null}
+          isHeroExpanded={isExpanded("hero")}
           onClick={() => handleCardClick("tech-stack")}
           onClose={handleClose}
           onHoverStart={() => handleHoverStart("tech-stack")}
@@ -106,7 +107,6 @@ export default function GridLayout() {
       </section>
       <Projects
         isExpanded={isExpanded("projects")}
-        isCollapsed={isCollapsed("projects")}
         onClick={() => handleCardClick("projects")}
         onClose={handleClose}
         onHoverStart={() => handleHoverStart("projects")}
