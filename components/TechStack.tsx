@@ -43,34 +43,29 @@ interface Milestone {
 
 const milestones: Milestone[] = [
   {
-    year: "2019",
+    year: "2020",
     title: "Started Coding",
     description: "Wrote my first lines of HTML & CSS",
   },
   {
-    year: "2020",
-    title: "First Freelance Gig",
-    description: "Built a landing page for a local business",
-  },
-  {
-    year: "2021",
-    title: "Went Full-Stack",
-    description: "Picked up React & Node.js, never looked back",
-  },
-  {
-    year: "2022",
-    title: "Agency Work",
-    description: "Joined a digital agency as a frontend developer",
+    year: "2023",
+    title: "Graduated frontend dev education",
+    description: "Completed my education as a frontend developer at Noroff - Grade A",
   },
   {
     year: "2023",
-    title: "Lead Developer",
-    description: "Led a team shipping B2B SaaS products",
+    title: "Started freelancing",
+    description: "Created WEBvest to kickstart my career. Working B2B",
   },
   {
-    year: "2024",
-    title: "Going Independent",
-    description: "Launched my own consultancy & product studio",
+    year: "2024 - Now",
+    title: "Enhancing skills in B2B sales",
+    description: "Working fulltime in B2B sales, while continuously improving my frontend skills through personal projects and freelancing",
+  },
+  {
+    year: "Future",
+    title: "Working fulltime as a dev",
+    description: "Landing a fulltime role as a frontend developer and continuing to grow my skills",
   },
 ];
 
@@ -165,23 +160,28 @@ function Timeline({ items }: { items: Milestone[] }) {
 
         {items.map((m, i) => (
           <motion.div
-            key={m.year}
+            key={`${m.year}-${m.title}`}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: i * 0.08 }}
             className="relative flex flex-col items-center flex-1 min-w-[120px]"
           >
             {/* Dot */}
-            <div className="w-3.5 h-3.5 rounded-full bg-secondary border-2 border-foreground/70 z-10 shrink-0" />
+            <div className="relative w-3.5 h-3.5 z-10 shrink-0">
+              {m.year === "2024 - Now" && (
+                <span className="absolute inset-0 rounded-full bg-secondary animate-ping opacity-60" />
+              )}
+              <div className="w-full h-full rounded-full bg-secondary border-2 border-foreground/70" />
+            </div>
 
             {/* Content */}
-            <span className="text-[0.65rem] font-semibold text-secondary mt-2">
+            <span className="text-[0.7rem] font-semibold text-secondary mt-2">
               {m.year}
             </span>
-            <span className="text-[0.6rem] font-medium text-text/80 mt-0.5">
+            <span className="text-xs font-medium text-text/80 mt-0.5 whitespace-nowrap">
               {m.title}
             </span>
-            <span className="text-[0.5rem] text-text/50 font-light mt-0.5 max-w-[100px] text-center leading-tight">
+            <span className="text-[0.6rem] text-text/50 font-light mt-0.5 max-w-[100px]  leading-tight border-l-secondary border-l-1 pl-2">
               {m.description}
             </span>
           </motion.div>
@@ -200,7 +200,6 @@ const ease: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 function SkillCard({
   label,
   icon,
-  detail,
   variant = "light",
   isCompact = false,
   isExpandedView = false,
@@ -210,7 +209,6 @@ function SkillCard({
 }: {
   label: string;
   icon: ReactNode;
-  detail?: string;
   variant?: "light" | "dark";
   isCompact?: boolean;
   isExpandedView?: boolean;
@@ -268,35 +266,30 @@ function SkillCard({
           },
         }}
       >
-        <span
-          className={variant === "dark" ? "text-white/70" : "text-secondary"}
-          style={{
-            fontSize: isCompact ? "0.75rem" : "1.125rem",
-            transition: `font-size ${dur} ${cubic}`,
+        <motion.span
+          key={String(isExpandedView)}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{
+            duration: 0.15,
+            delay: isExpandedView ? staggerIndex * 0.025 + 0.15 : 0,
           }}
+          className={`flex flex-col items-center ${isCompact ? "gap-0.5" : "gap-1"}`}
         >
-          {icon}
-        </span>
-        <span className="text-center leading-tight max-w-full px-1">
-          {label}
-        </span>
-      </motion.span>
-
-      <AnimatePresence>
-        {isExpandedView && isActive && detail && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease }}
-            className="overflow-hidden"
+          <span
+            className={variant === "dark" ? "text-white/70" : "text-secondary"}
+            style={{
+              fontSize: isCompact ? "0.75rem" : "1.125rem",
+              transition: `font-size ${dur} ${cubic}`,
+            }}
           >
-            <p className="text-[0.6rem] leading-relaxed text-text/70 font-light mt-2 max-w-28 text-center">
-              {detail}
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            {icon}
+          </span>
+          <span className="text-center leading-tight max-w-full px-1">
+            {label}
+          </span>
+        </motion.span>
+      </motion.span>
     </motion.div>
   );
 }
@@ -340,8 +333,8 @@ export default function TechStack({
   };
 
   const handleSkillClick = (label: string) => {
-    setActiveSkill(label);
     onClick();
+    setTimeout(() => setActiveSkill(label), 350);
   };
 
   const cardGridClasses = isHCollapse
@@ -363,7 +356,7 @@ export default function TechStack({
         flexBasis: 0,
         transition: flexTransition,
       }}
-      className={`h-full bg-foreground/70 backdrop-blur-xl border border-secondary/30 shadow-lg rounded-sm flex flex-col relative cursor-pointer overflow-hidden
+      className={`h-full bg-foreground/70 backdrop-blur-xl border border-secondary/30 shadow-lg rounded-sm flex flex-col justify-center gap-10 relative cursor-pointer overflow-hidden
         ${isCollapsed ? "opacity-90 hover:opacity-100" : ""}
       `}
     >
@@ -386,9 +379,27 @@ export default function TechStack({
           flexGrow: isExpanded ? 0 : 1,
           flexShrink: 0,
           paddingTop: isExpanded ? 32 : isHCollapse ? 12 : isVCollapse ? 8 : 20,
-          paddingRight: isExpanded ? 32 : isHCollapse ? 12 : isVCollapse ? 8 : 20,
-          paddingBottom: isExpanded ? 16 : isHCollapse ? 12 : isVCollapse ? 8 : 20,
-          paddingLeft: isExpanded ? 32 : isHCollapse ? 12 : isVCollapse ? 8 : 20,
+          paddingRight: isExpanded
+            ? 32
+            : isHCollapse
+              ? 12
+              : isVCollapse
+                ? 8
+                : 20,
+          paddingBottom: isExpanded
+            ? 16
+            : isHCollapse
+              ? 12
+              : isVCollapse
+                ? 8
+                : 20,
+          paddingLeft: isExpanded
+            ? 32
+            : isHCollapse
+              ? 12
+              : isVCollapse
+                ? 8
+                : 20,
           gap: isExpanded ? 16 : isCollapsed ? 8 : 20,
           transition: `flex-grow ${dur} ${cubic}, padding ${dur} ${cubic}, gap ${dur} ${cubic}`,
         }}
@@ -403,20 +414,23 @@ export default function TechStack({
                 : "items-center gap-2"
           }`}
         >
-          <h3
+          <motion.h3
+            key={`tech-heading-${isExpanded}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2, delay: isExpanded ? 0.2 : 0 }}
             className={`font-semibold uppercase tracking-wider text-secondary ${
               isVCollapse ? "text-[0.5rem]" : "text-xs"
             }`}
           >
             Tech Stack
-          </h3>
+          </motion.h3>
           <div className={cardGridClasses}>
             {techStack.map((item, i) => (
               <SkillCard
                 key={item.label}
                 label={item.label}
                 icon={item.icon}
-                detail={item.detail}
                 variant="dark"
                 isCompact={isCollapsed}
                 isExpandedView={isExpanded}
@@ -430,6 +444,41 @@ export default function TechStack({
               />
             ))}
           </div>
+          {(() => {
+            const item = isExpanded && activeSkill ? techStack.find((i) => i.label === activeSkill) : null;
+            return (
+              <AnimatePresence>
+                {item && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25, ease }}
+                    className="overflow-hidden w-full"
+                  >
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={item.label}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -4 }}
+                        transition={{ duration: 0.18, ease }}
+                        className="bg-secondary rounded-lg border border-secondary/40 border-l-2 border-l-white/25 px-5 py-4"
+                      >
+                        <div className="flex items-center gap-2 mb-2.5">
+                          <span className="text-white/60 text-lg">{item.icon}</span>
+                          <span className="text-xs font-semibold text-white/90 uppercase tracking-wider">{item.label}</span>
+                        </div>
+                        <p className="text-xs leading-relaxed text-white/70 font-light">
+                          {item.detail}
+                        </p>
+                      </motion.div>
+                    </AnimatePresence>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            );
+          })()}
         </div>
 
         {/* Beyond Code */}
@@ -442,20 +491,23 @@ export default function TechStack({
                 : "items-center gap-2"
           }`}
         >
-          <h3
+          <motion.h3
+            key={`beyond-heading-${isExpanded}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2, delay: isExpanded ? 0.2 : 0 }}
             className={`font-semibold uppercase tracking-wider text-secondary ${
               isVCollapse ? "text-[0.5rem]" : "text-xs"
             }`}
           >
             Beyond Code
-          </h3>
+          </motion.h3>
           <div className={cardGridClasses}>
             {otherSkills.map((item, i) => (
               <SkillCard
                 key={item.label}
                 label={item.label}
                 icon={item.icon}
-                detail={item.detail}
                 isCompact={isCollapsed}
                 isExpandedView={isExpanded}
                 isActive={activeSkill === item.label}
@@ -468,15 +520,55 @@ export default function TechStack({
               />
             ))}
           </div>
+          {(() => {
+            const item = isExpanded && activeSkill ? otherSkills.find((i) => i.label === activeSkill) : null;
+            return (
+              <AnimatePresence>
+                {item && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25, ease }}
+                    className="overflow-hidden w-full"
+                  >
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={item.label}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -4 }}
+                        transition={{ duration: 0.18, ease }}
+                        className="bg-background/70 rounded-lg border border-secondary/15 border-l-2 border-l-secondary px-5 py-4"
+                      >
+                        <div className="flex items-center gap-2 mb-2.5">
+                          <span className="text-secondary text-lg">{item.icon}</span>
+                          <span className="text-xs font-semibold text-text/80 uppercase tracking-wider">{item.label}</span>
+                        </div>
+                        <p className="text-xs leading-relaxed text-text/70 font-light">
+                          {item.detail}
+                        </p>
+                      </motion.div>
+                    </AnimatePresence>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            );
+          })()}
         </div>
       </div>
 
       {/* Timeline — expanded only */}
       {isExpanded && (
         <div className="w-full px-8 pb-6">
-          <h3 className="font-semibold uppercase tracking-wider text-secondary text-xs mb-3">
+          <motion.h3
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2, delay: 0.2 }}
+            className="font-semibold uppercase tracking-wider text-secondary text-xs mb-3"
+          >
             Journey
-          </h3>
+          </motion.h3>
           <Timeline items={milestones} />
         </div>
       )}
