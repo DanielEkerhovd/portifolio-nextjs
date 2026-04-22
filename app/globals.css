@@ -37,14 +37,14 @@ body {
 .mesh-blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(100px);
-  opacity: 0.6;
+  filter: blur(60px);
+  opacity: 0.5;
   will-change: transform;
 }
 
 .mesh-blob-1 {
-  width: 55%;
-  height: 55%;
+  width: 45%;
+  height: 45%;
   top: -15%;
   left: -10%;
   background: #d4a574;
@@ -52,8 +52,8 @@ body {
 }
 
 .mesh-blob-2 {
-  width: 50%;
-  height: 50%;
+  width: 40%;
+  height: 40%;
   bottom: -10%;
   right: -10%;
   background: #c9917a;
@@ -61,8 +61,8 @@ body {
 }
 
 .mesh-blob-3 {
-  width: 40%;
-  height: 40%;
+  width: 35%;
+  height: 35%;
   top: 30%;
   left: 40%;
   background: #bfaa70;
@@ -70,8 +70,8 @@ body {
 }
 
 .mesh-blob-4 {
-  width: 45%;
-  height: 45%;
+  width: 38%;
+  height: 38%;
   top: 50%;
   left: -5%;
   background: #dac489;

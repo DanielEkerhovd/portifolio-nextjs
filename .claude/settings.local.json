@@ -14,7 +14,14 @@
       "Bash(npm install react-icons)",
       "Bash(npx next build)",
       "Bash(node -e \":*)",
-      "Bash(python3 -c \":*)"
+      "Bash(python3 -c \":*)",
+      "Bash(npx next:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm install:*)",
+      "Bash(git checkout:*)",
+      "Bash(node -e \"console.log\\(require\\('crypto'\\).randomBytes\\(32\\).toString\\('hex'\\)\\)\")",
+      "Bash(npx tsx:*)",
+      "Bash(git stash:*)"
     ]
   }
 }

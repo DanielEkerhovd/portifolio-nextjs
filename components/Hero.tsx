@@ -1,28 +1,44 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { motion } from "motion/react";
 import { FaGithub, FaLinkedin, FaPhone } from "react-icons/fa";
 import { LuMousePointer2 } from "react-icons/lu";
 import { MdEmail } from "react-icons/md";
+import type { SanitySiteInfo, SanityContact } from "@/lib/sanity.types";
+import type { IconType } from "react-icons";
 
-const contactItems = [
-  {
-    Icon: MdEmail,
-    label: "danielekerh@gmail.com",
-    href: "mailto:danielekerh@gmail.com",
-  },
-  {
-    Icon: FaGithub,
-    label: "github.com/DanielEkerhovd",
-    href: "https://github.com/DanielEkerhovd",
-  },
-  {
-    Icon: FaLinkedin,
-    label: "linkedin.com/in/daniel-ekerhovd",
-    href: "https://www.linkedin.com/in/daniel-ekerhovd/",
-  },
-  { Icon: FaPhone, label: "+47 948 65 253", href: "tel:+4794865253" },
+const contactIconMap: Record<string, IconType> = {
+  email: MdEmail,
+  github: FaGithub,
+  linkedin: FaLinkedin,
+  phone: FaPhone,
+};
+
+/* ── Fallback data ── */
+
+const fallbackContacts: SanityContact[] = [
+  { type: "email", label: "danielekerh@gmail.com", url: "mailto:danielekerh@gmail.com" },
+  { type: "github", label: "github.com/DanielEkerhovd", url: "https://github.com/DanielEkerhovd" },
+  { type: "linkedin", label: "linkedin.com/in/daniel-ekerhovd", url: "https://www.linkedin.com/in/daniel-ekerhovd/" },
+  { type: "phone", label: "+47 948 65 253", url: "tel:+4794865253" },
 ];
+
+const fallbackSiteInfo: SanitySiteInfo = {
+  _id: "fallback",
+  welcomeText: "Welcome to the portifolio of",
+  name: "Daniel Ekerhovd",
+  role: "Frontend Developer",
+  shortDescriptions: [
+    "Im a frontend developer based in Rosendal, Norway",
+    "I specialize in web development B2B - Creating creative solutions for client pains",
+  ],
+  longDescriptions: [
+    "Since i was little ive been fascinated by technology, while needing to find creative outlets for my energy. Coding turned out to be the perfect mix of creativity and technicality.",
+    "I started out doing small freelance jobs, building websites for local businesses. Currently working with B2B sales, while doing webdev on the side",
+  ],
+  contacts: fallbackContacts,
+};
 
 interface HeroProps {
   isExpanded: boolean;
@@ -32,10 +48,11 @@ interface HeroProps {
   onHoverStart: () => void;
   onHoverEnd: () => void;
   flex: number;
+  siteInfo: SanitySiteInfo | null;
 }
 
 const cubic = "cubic-bezier(0.25, 0.1, 0.25, 1)";
-const dur = "0.35s";
+const dur = "0.4s";
 const cssTransition = `flex-grow ${dur} ${cubic}, font-size ${dur} ${cubic}, line-height ${dur} ${cubic}, gap ${dur} ${cubic}`;
 
 function getSizes(isCollapsed: boolean, isExpanded: boolean) {
@@ -77,7 +94,10 @@ export default function Hero({
   onHoverStart,
   onHoverEnd,
   flex,
+  siteInfo: siteInfoProp,
 }: HeroProps) {
+  const info = siteInfoProp ?? fallbackSiteInfo;
+  const contacts = info.contacts?.length ? info.contacts : fallbackContacts;
   const sizes = getSizes(isCollapsed, isExpanded);
 
   const [showHint, setShowHint] = useState(false);
@@ -113,7 +133,7 @@ export default function Hero({
     : `opacity 0.1s ${cubic}, grid-template-columns 0.15s ${cubic}`;
 
   return (
-    <section
+    <motion.section
       onClick={isExpanded ? undefined : onClick}
       onMouseEnter={onHoverStart}
       onMouseLeave={onHoverEnd}
@@ -121,9 +141,9 @@ export default function Hero({
         flexGrow: flex,
         flexShrink: 0,
         flexBasis: 0,
-        transition: cssTransition,
+        transition: `flex-grow 0.4s ${cubic}`,
       }}
-      className={`h-full bg-foreground/70 backdrop-blur-xl border border-secondary/30 shadow-lg rounded-sm flex relative cursor-pointer overflow-hidden
+      className={`h-full bg-foreground/70 backdrop-blur-sm border border-secondary/30 shadow-lg rounded-sm flex relative cursor-pointer overflow-hidden
         ${isCollapsed ? "opacity-90 hover:opacity-100" : ""} items-center justify-center
       `}
     >
@@ -139,18 +159,6 @@ export default function Hero({
         </button>
       )}
 
-      {/* DEV: clear hint localStorage keys */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          localStorage.removeItem("hero-hint-seen");
-          localStorage.removeItem("tech-hint-seen");
-        }}
-        className="absolute top-4 left-4 px-2 py-1 text-xs rounded bg-secondary/20 text-secondary/60 hover:bg-secondary/30 transition-colors z-10"
-      >
-        clear localStorage hints
-      </button>
-
       <div className="flex flex-row items-center">
         {/* Contact sidebar — slides in from left when expanded */}
         <div
@@ -163,34 +171,39 @@ export default function Hero({
         >
           <div className="overflow-hidden">
             <div className="flex flex-col gap-5 pr-6 border-r border-secondary/30 mr-6">
-              {contactItems.map(({ Icon, label, href }, i) => (
-                <a
-                  key={label}
-                  href={href}
-                  target={href.startsWith("http") ? "_blank" : undefined}
-                  rel={
-                    href.startsWith("http") ? "noopener noreferrer" : undefined
-                  }
-                  onClick={(e) => e.stopPropagation()}
-                  className="flex items-center justify-end gap-3 text-secondary hover:text-white transition-colors group"
-                  style={{
-                    fontSize: "0.875rem",
-                    opacity: isExpanded ? 1 : 0,
-                    transform: isExpanded
-                      ? "translateX(0)"
-                      : "translateX(-10px)",
-                    transition: isExpanded
-                      ? `opacity 0.3s ${cubic} ${0.72 + i * 0.07}s, transform 0.3s ${cubic} ${0.72 + i * 0.07}s, color 0.2s`
-                      : `opacity 0.05s ${cubic}, transform 0.05s ${cubic}, color 0.2s`,
-                  }}
-                >
-                  <span className="whitespace-nowrap">{label}</span>
-                  <Icon
-                    size={16}
-                    className="shrink-0 group-hover:scale-110 transition-transform"
-                  />
-                </a>
-              ))}
+              {contacts.map((contact, i) => {
+                const Icon = contactIconMap[contact.type];
+                return (
+                  <a
+                    key={contact.label}
+                    href={contact.url}
+                    target={contact.url.startsWith("http") ? "_blank" : undefined}
+                    rel={
+                      contact.url.startsWith("http") ? "noopener noreferrer" : undefined
+                    }
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex items-center justify-end gap-3 text-secondary hover:text-white transition-colors group"
+                    style={{
+                      fontSize: "0.875rem",
+                      opacity: isExpanded ? 1 : 0,
+                      transform: isExpanded
+                        ? "translateX(0)"
+                        : "translateX(-10px)",
+                      transition: isExpanded
+                        ? `opacity 0.3s ${cubic} ${0.72 + i * 0.07}s, transform 0.3s ${cubic} ${0.72 + i * 0.07}s, color 0.2s`
+                        : `opacity 0.05s ${cubic}, transform 0.05s ${cubic}, color 0.2s`,
+                    }}
+                  >
+                    <span className="whitespace-nowrap">{contact.label}</span>
+                    {Icon && (
+                      <Icon
+                        size={16}
+                        className="shrink-0 group-hover:scale-110 transition-transform"
+                      />
+                    )}
+                  </a>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -209,31 +222,29 @@ export default function Hero({
               className="font-subtext font-light text-secondary"
               style={{ ...sizes.welcome, transition: cssTransition }}
             >
-              Welcome to the portifolio of
+              {info.welcomeText}
             </p>
             <h1
               className="font-semibold"
               style={{ ...sizes.name, transition: cssTransition }}
             >
-              Daniel Ekerhovd
+              {info.name}
             </h1>
             <p
               className="text-secondary font-subtext pb-4"
               style={{ ...sizes.role, transition: cssTransition }}
             >
-              Frontend Developer
+              {info.role}
             </p>
           </div>
 
           {/* Description - always rendered, animates size */}
           <div className="font-light">
-            <p style={{ ...sizes.desc, transition: cssTransition }}>
-              Im a frontend developer based in Rosendal, Norway
-            </p>
-            <p style={{ ...sizes.desc, transition: cssTransition }}>
-              I specialize in web development B2B - Creating creative solutions
-              for client pains
-            </p>
+            {info.shortDescriptions.map((line, i) => (
+              <p key={i} style={{ ...sizes.desc, transition: cssTransition }}>
+                {line}
+              </p>
+            ))}
           </div>
 
           {/* Expanded paragraph — always in DOM, height animated via grid rows */}
@@ -246,22 +257,15 @@ export default function Hero({
             }}
           >
             <div className="overflow-hidden">
-              <p
-                className="max-w-xl font-light"
-                style={{ ...sizes.desc, transition: cssTransition }}
-              >
-                Since i was little ive been fascinated by technology, while
-                needing to find creative outlets for my energy. Coding turned
-                out to be the perfect mix of creativity and technicality.
-              </p>
-              <p
-                className="max-w-xl font-light pt-3"
-                style={{ ...sizes.desc, transition: cssTransition }}
-              >
-                I started out doing small freelance jobs, building websites for
-                local businesses. Currently working with B2B sales, while doing
-                webdev on
-              </p>
+              {info.longDescriptions.map((paragraph, i) => (
+                <p
+                  key={i}
+                  className={`max-w-xl font-light ${i > 0 ? "pt-3" : ""}`}
+                  style={{ ...sizes.desc, transition: cssTransition }}
+                >
+                  {paragraph}
+                </p>
+              ))}
             </div>
           </div>
         </div>
@@ -314,6 +318,7 @@ export default function Hero({
                 animationDuration: "2.4s",
                 animationTimingFunction: "ease-out",
                 animationIterationCount: "infinite",
+                animationPlayState: hintVisible ? "running" : "paused",
               }}
             />
             {/* Burst lines */}
@@ -338,6 +343,7 @@ export default function Hero({
                     animationDuration: "2.4s",
                     animationTimingFunction: "ease-out",
                     animationIterationCount: "infinite",
+                    animationPlayState: hintVisible ? "running" : "paused",
                   }}
                 />
               </span>
@@ -351,12 +357,13 @@ export default function Hero({
               animationDuration: "2.4s",
               animationTimingFunction: "ease-in-out",
               animationIterationCount: "infinite",
+              animationPlayState: hintVisible ? "running" : "paused",
             }}
           >
             <LuMousePointer2 size={20} />
           </span>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }

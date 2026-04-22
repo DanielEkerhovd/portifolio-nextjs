@@ -7,24 +7,9 @@ const cubic = "cubic-bezier(0.25, 0.1, 0.25, 1)";
 const dur = "0.35s";
 const sizeTransition = `width ${dur} ${cubic}, height ${dur} ${cubic}, gap ${dur} ${cubic}`;
 
-import {
-  SiReact,
-  SiNextdotjs,
-  SiTypescript,
-  SiTailwindcss,
-  SiVite,
-  SiFigma,
-  SiDungeonsanddragons,
-} from "react-icons/si";
-import {
-  HiOutlineBriefcase,
-  HiOutlinePencilSquare,
-  HiOutlineClipboardDocumentList,
-  HiOutlineUserGroup,
-} from "react-icons/hi2";
 import { LuMousePointer2 } from "react-icons/lu";
-
-import { TbVinyl } from "react-icons/tb";
+import { getIcon } from "@/lib/iconMap";
+import type { SanitySkill, SanityMilestone } from "@/lib/sanity.types";
 
 /* ── Data types ── */
 
@@ -40,114 +25,40 @@ interface Milestone {
   description: string;
 }
 
-/* ── Timeline data ── */
+function toSkillItem(s: SanitySkill): SkillItem {
+  return { label: s.label, icon: getIcon(s.icon), detail: s.detail };
+}
 
-const milestones: Milestone[] = [
-  {
-    year: "2020",
-    title: "Started Coding",
-    description: "Wrote my first lines of HTML & CSS",
-  },
-  {
-    year: "2023",
-    title: "Graduated frontend dev education",
-    description: "Completed my education as a frontend developer at Noroff - Grade A",
-  },
-  {
-    year: "2023",
-    title: "Started freelancing",
-    description: "Created WEBvest to kickstart my career. Working B2B",
-  },
-  {
-    year: "2024 - Now",
-    title: "Enhancing skills in B2B sales",
-    description: "Working fulltime in B2B sales, while continuously improving my frontend skills through personal projects and freelancing",
-  },
-  {
-    year: "Future",
-    title: "Working fulltime as a dev",
-    description: "Landing a fulltime role as a frontend developer and continuing to grow my skills",
-  },
+function toMilestone(m: SanityMilestone): Milestone {
+  return { year: m.year, title: m.title, description: m.description };
+}
+
+/* ── Fallback data ── */
+
+const fallbackTechStack: SkillItem[] = [
+  { label: "React", icon: getIcon("react"), detail: "Building component-driven interfaces with React since 2020. Experienced with hooks, context, custom abstractions, and performance optimization for complex UIs." },
+  { label: "Next.js", icon: getIcon("nextjs"), detail: "My go-to framework for production web apps. Comfortable with SSR, SSG, API routes, middleware, and the app router architecture." },
+  { label: "TypeScript", icon: getIcon("typescript"), detail: "TypeScript-first in all projects. Strong with generics, discriminated unions, and building type-safe APIs that catch bugs at compile time." },
+  { label: "Tailwind CSS", icon: getIcon("tailwind"), detail: "Rapid UI development with utility-first CSS. Skilled at building design systems, responsive layouts, and custom theme configurations." },
+  { label: "Vite", icon: getIcon("vite"), detail: "Using Vite for fast dev environments and optimized builds. Experienced with plugin configuration, HMR tuning, and library mode." },
+  { label: "Figma", icon: getIcon("figma"), detail: "Bridging design and development. Proficient in component libraries, auto-layout, prototyping, and translating designs into pixel-perfect code." },
 ];
 
-/* ── Skill data ── */
-
-const techStack: SkillItem[] = [
-  {
-    label: "React",
-    icon: <SiReact />,
-    detail:
-      "Building component-driven interfaces with React since 2020. Experienced with hooks, context, custom abstractions, and performance optimization for complex UIs.",
-  },
-  {
-    label: "Next.js",
-    icon: <SiNextdotjs />,
-    detail:
-      "My go-to framework for production web apps. Comfortable with SSR, SSG, API routes, middleware, and the app router architecture.",
-  },
-  {
-    label: "TypeScript",
-    icon: <SiTypescript />,
-    detail:
-      "TypeScript-first in all projects. Strong with generics, discriminated unions, and building type-safe APIs that catch bugs at compile time.",
-  },
-  {
-    label: "Tailwind CSS",
-    icon: <SiTailwindcss />,
-    detail:
-      "Rapid UI development with utility-first CSS. Skilled at building design systems, responsive layouts, and custom theme configurations.",
-  },
-  {
-    label: "Vite",
-    icon: <SiVite />,
-    detail:
-      "Using Vite for fast dev environments and optimized builds. Experienced with plugin configuration, HMR tuning, and library mode.",
-  },
-  {
-    label: "Figma",
-    icon: <SiFigma />,
-    detail:
-      "Bridging design and development. Proficient in component libraries, auto-layout, prototyping, and translating designs into pixel-perfect code.",
-  },
+const fallbackOtherSkills: SkillItem[] = [
+  { label: "B2B Sales", icon: getIcon("briefcase"), detail: "Years of experience in B2B sales, from lead generation to closing enterprise deals. I understand the client journey and how to communicate technical value." },
+  { label: "UX Design", icon: getIcon("pencil"), detail: "User-centered design thinking applied to every project. Experienced with user research, wireframing, usability testing, and iterative design processes." },
+  { label: "Project Management", icon: getIcon("clipboard"), detail: "Leading cross-functional teams with agile methodologies. Comfortable with sprint planning, stakeholder communication, and shipping on time." },
+  { label: "Client Relations", icon: getIcon("users"), detail: "Building lasting partnerships with clients through clear communication, expectation management, and consistently delivering value." },
+  { label: "Dungeon Master", icon: getIcon("dnd"), detail: "Crafting immersive tabletop RPG experiences for years. Storytelling, improvisation, and keeping a group engaged — skills that transfer surprisingly well to tech." },
+  { label: "DJ", icon: getIcon("vinyl"), detail: "Mixing and curating music for events and personal enjoyment. Reading the room and creating atmosphere is an art form I bring to everything I do." },
 ];
 
-const otherSkills: SkillItem[] = [
-  {
-    label: "B2B Sales",
-    icon: <HiOutlineBriefcase />,
-    detail:
-      "Years of experience in B2B sales, from lead generation to closing enterprise deals. I understand the client journey and how to communicate technical value.",
-  },
-  {
-    label: "UX Design",
-    icon: <HiOutlinePencilSquare />,
-    detail:
-      "User-centered design thinking applied to every project. Experienced with user research, wireframing, usability testing, and iterative design processes.",
-  },
-  {
-    label: "Project Management",
-    icon: <HiOutlineClipboardDocumentList />,
-    detail:
-      "Leading cross-functional teams with agile methodologies. Comfortable with sprint planning, stakeholder communication, and shipping on time.",
-  },
-  {
-    label: "Client Relations",
-    icon: <HiOutlineUserGroup />,
-    detail:
-      "Building lasting partnerships with clients through clear communication, expectation management, and consistently delivering value.",
-  },
-  {
-    label: "Dungeon Master",
-    icon: <SiDungeonsanddragons />,
-    detail:
-      "Crafting immersive tabletop RPG experiences for years. Storytelling, improvisation, and keeping a group engaged — skills that transfer surprisingly well to tech.",
-  },
-  {
-    label: "DJ",
-    icon: <TbVinyl />,
-    detail:
-      "Mixing and curating music for events and personal enjoyment. Reading the room and creating atmosphere is an art form I bring to everything I do.",
-  },
+const fallbackMilestones: Milestone[] = [
+  { year: "2020", title: "Started Coding", description: "Wrote my first lines of HTML & CSS" },
+  { year: "2023", title: "Graduated frontend dev education", description: "Completed my education as a frontend developer at Noroff - Grade A" },
+  { year: "2023", title: "Started freelancing", description: "Created WEBvest to kickstart my career. Working B2B" },
+  { year: "2024 - Now", title: "Enhancing skills in B2B sales", description: "Working fulltime in B2B sales, while continuously improving my frontend skills through personal projects and freelancing" },
+  { year: "Future", title: "Working fulltime as a dev", description: "Landing a fulltime role as a frontend developer and continuing to grow my skills" },
 ];
 
 /* ── Timeline ── */
@@ -302,7 +213,7 @@ function SkillCard({
 
 /* ── Main component ── */
 
-const flexTransition = "flex-grow 0.35s cubic-bezier(0.25, 0.1, 0.25, 1)";
+const flexTransition = "flex-grow 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)";
 
 interface TechStackProps {
   isExpanded: boolean;
@@ -314,6 +225,9 @@ interface TechStackProps {
   onHoverStart: () => void;
   onHoverEnd: () => void;
   flex: number;
+  techSkills: SanitySkill[];
+  beyondSkills: SanitySkill[];
+  milestones: SanityMilestone[];
 }
 
 export default function TechStack({
@@ -326,7 +240,16 @@ export default function TechStack({
   onHoverStart,
   onHoverEnd,
   flex,
+  techSkills: techSkillsProp,
+  beyondSkills: beyondSkillsProp,
+  milestones: milestonesProp,
 }: TechStackProps) {
+  const techStack: SkillItem[] =
+    techSkillsProp.length > 0 ? techSkillsProp.map(toSkillItem) : fallbackTechStack;
+  const otherSkills: SkillItem[] =
+    beyondSkillsProp.length > 0 ? beyondSkillsProp.map(toSkillItem) : fallbackOtherSkills;
+  const milestones: Milestone[] =
+    milestonesProp.length > 0 ? milestonesProp.map(toMilestone) : fallbackMilestones;
   const isHCollapse = isCollapsed && collapseAxis === "horizontal";
   const isVCollapse = isCollapsed && collapseAxis === "vertical";
   const [activeSkill, setActiveSkill] = useState<string | null>(null);
@@ -374,7 +297,7 @@ export default function TechStack({
         : "grid grid-cols-6 gap-2 justify-items-center";
 
   return (
-    <section
+    <motion.section
       onClick={isExpanded ? undefined : onClick}
       onMouseEnter={onHoverStart}
       onMouseLeave={onHoverEnd}
@@ -384,7 +307,7 @@ export default function TechStack({
         flexBasis: 0,
         transition: flexTransition,
       }}
-      className={`h-full bg-foreground/70 backdrop-blur-xl border border-secondary/30 shadow-lg rounded-sm flex flex-col justify-center gap-10 relative cursor-pointer overflow-hidden
+      className={`h-full bg-foreground/70 backdrop-blur-xl border border-secondary/30 shadow-lg rounded-sm flex flex-col relative cursor-pointer overflow-hidden
         ${isCollapsed ? "opacity-90 hover:opacity-100" : ""}
       `}
     >
@@ -404,8 +327,10 @@ export default function TechStack({
       <div
         className={`flex ${isHCollapse || isVCollapse ? "flex-row" : "flex-col"} items-center justify-center`}
         style={{
-          flexGrow: isExpanded ? 0 : 1,
-          flexShrink: 0,
+          flexGrow: 1,
+          flexShrink: 1,
+          flexBasis: 0,
+          minHeight: 0,
           paddingTop: isExpanded ? 32 : isHCollapse ? 12 : isVCollapse ? 8 : 20,
           paddingRight: isExpanded
             ? 32
@@ -429,7 +354,7 @@ export default function TechStack({
                 ? 8
                 : 20,
           gap: isExpanded ? 16 : isCollapsed ? 8 : 20,
-          transition: `flex-grow ${dur} ${cubic}, padding ${dur} ${cubic}, gap ${dur} ${cubic}`,
+          transition: `padding ${dur} ${cubic}, gap ${dur} ${cubic}`,
         }}
       >
         {/* Tech Stack */}
@@ -453,7 +378,7 @@ export default function TechStack({
           >
             Tech Stack
           </motion.h3>
-          <div className={cardGridClasses}>
+          <div className={cardGridClasses} style={{ transition: `gap ${dur} ${cubic}` }}>
             {techStack.map((item, i) => (
               <SkillCard
                 key={item.label}
@@ -472,41 +397,6 @@ export default function TechStack({
               />
             ))}
           </div>
-          {(() => {
-            const item = isExpanded && activeSkill ? techStack.find((i) => i.label === activeSkill) : null;
-            return (
-              <AnimatePresence>
-                {item && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.25, ease }}
-                    className="overflow-hidden w-full"
-                  >
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key={item.label}
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -4 }}
-                        transition={{ duration: 0.18, ease }}
-                        className="bg-secondary rounded-lg border border-secondary/40 border-l-2 border-l-white/25 px-5 py-4"
-                      >
-                        <div className="flex items-center gap-2 mb-2.5">
-                          <span className="text-white/60 text-lg">{item.icon}</span>
-                          <span className="text-xs font-semibold text-white/90 uppercase tracking-wider">{item.label}</span>
-                        </div>
-                        <p className="text-xs leading-relaxed text-white/70 font-light">
-                          {item.detail}
-                        </p>
-                      </motion.div>
-                    </AnimatePresence>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            );
-          })()}
         </div>
 
         {/* Beyond Code */}
@@ -530,7 +420,7 @@ export default function TechStack({
           >
             Beyond Code
           </motion.h3>
-          <div className={cardGridClasses}>
+          <div className={cardGridClasses} style={{ transition: `gap ${dur} ${cubic}` }}>
             {otherSkills.map((item, i) => (
               <SkillCard
                 key={item.label}
@@ -548,41 +438,6 @@ export default function TechStack({
               />
             ))}
           </div>
-          {(() => {
-            const item = isExpanded && activeSkill ? otherSkills.find((i) => i.label === activeSkill) : null;
-            return (
-              <AnimatePresence>
-                {item && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.25, ease }}
-                    className="overflow-hidden w-full"
-                  >
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key={item.label}
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -4 }}
-                        transition={{ duration: 0.18, ease }}
-                        className="bg-background/70 rounded-lg border border-secondary/15 border-l-2 border-l-secondary px-5 py-4"
-                      >
-                        <div className="flex items-center gap-2 mb-2.5">
-                          <span className="text-secondary text-lg">{item.icon}</span>
-                          <span className="text-xs font-semibold text-text/80 uppercase tracking-wider">{item.label}</span>
-                        </div>
-                        <p className="text-xs leading-relaxed text-text/70 font-light">
-                          {item.detail}
-                        </p>
-                      </motion.div>
-                    </AnimatePresence>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            );
-          })()}
         </div>
       </div>
 
@@ -670,20 +525,48 @@ export default function TechStack({
         </div>
       </div>
 
-      {/* Timeline — expanded only */}
+      {/* Timeline — no height animation; container's flex transition + overflow-hidden handles reveal */}
       {isExpanded && (
-        <div className="w-full px-8 pb-6">
-          <motion.h3
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.2, delay: 0.35 }}
-            className="font-semibold uppercase tracking-wider text-secondary text-xs mb-1"
-          >
+        <div className="w-full px-8 pb-6 shrink-0">
+          <h3 className="font-semibold uppercase tracking-wider text-secondary text-xs mb-1">
             Journey
-          </motion.h3>
+          </h3>
           <Timeline items={milestones} />
         </div>
       )}
-    </section>
+      {/* Skill detail — absolutely positioned so it never affects layout flow */}
+      {isExpanded && (() => {
+        const item = activeSkill
+          ? techStack.find((i) => i.label === activeSkill) ?? otherSkills.find((i) => i.label === activeSkill)
+          : null;
+        const isTech = item ? techStack.some((i) => i.label === item.label) : false;
+        return (
+          <AnimatePresence mode="wait">
+            {item && (
+              <motion.div
+                key={item.label}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.18, ease }}
+                className={`absolute left-8 right-8 bottom-20 z-20 rounded-lg border border-l-2 px-5 py-4 shadow-lg ${
+                  isTech
+                    ? "bg-secondary border-secondary/40 border-l-white/25"
+                    : "bg-background/90 border-secondary/15 border-l-secondary"
+                }`}
+              >
+                <div className="flex items-center gap-2 mb-2.5">
+                  <span className={`text-lg ${isTech ? "text-white/60" : "text-secondary"}`}>{item.icon}</span>
+                  <span className={`text-xs font-semibold uppercase tracking-wider ${isTech ? "text-white/90" : "text-text/80"}`}>{item.label}</span>
+                </div>
+                <p className={`text-xs leading-relaxed font-light ${isTech ? "text-white/70" : "text-text/70"}`}>
+                  {item.detail}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        );
+      })()}
+    </motion.section>
   );
 }
