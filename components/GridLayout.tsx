@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "motion/react";
+
 import Hero from "./Hero";
 import TechStack from "./TechStack";
 import Projects from "./Projects";

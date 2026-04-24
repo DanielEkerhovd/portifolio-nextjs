@@ -25,6 +25,8 @@ interface Project {
   link: string;
   thumbnailUrl?: string;
   coverUrl?: string;
+  thumbnailHotspot?: { x: number; y: number };
+  coverHotspot?: { x: number; y: number };
 }
 
 const defaultAccent = "from-secondary/60 to-secondary/30";
@@ -37,10 +39,16 @@ function toProject(sp: SanityProject): Project {
     link: sp.link || "#",
     accent: sp.accent || defaultAccent,
     thumbnailUrl: sp.thumbnail?.asset?._ref
-      ? urlFor(sp.thumbnail).width(600).height(400).fit("crop").auto("format").url()
+      ? urlFor(sp.thumbnail).width(1200).auto("format").quality(80).url()
       : undefined,
     coverUrl: sp.cover?.asset?._ref
-      ? urlFor(sp.cover).width(1200).height(630).fit("crop").auto("format").url()
+      ? urlFor(sp.cover).width(2400).auto("format").quality(80).url()
+      : undefined,
+    thumbnailHotspot: sp.thumbnail?.hotspot
+      ? { x: sp.thumbnail.hotspot.x, y: sp.thumbnail.hotspot.y }
+      : undefined,
+    coverHotspot: sp.cover?.hotspot
+      ? { x: sp.cover.hotspot.x, y: sp.cover.hotspot.y }
       : undefined,
     tags: (sp.tags || []).map((t) => ({
       label: t.label,
@@ -112,12 +120,14 @@ function ProjectCard({
   isExpanded,
   isActive,
   totalCount,
+  isFirst,
   onClick,
 }: {
   project: Project;
   isExpanded: boolean;
   isActive: boolean;
   totalCount: number;
+  isFirst: boolean;
   onClick: () => void;
 }) {
   // When expanded (vertical column): ≤3 cards each get exactly 1/3, >3 shrink to fit
@@ -129,9 +139,13 @@ function ProjectCard({
 
   return (
     <motion.div
-      layout="position"
+      layout={isExpanded ? "position" : false}
       transition={{
-        layout: { type: "tween", duration: 0.4, ease: [0.4, 0, 0.2, 1] },
+        layout: {
+          type: "tween",
+          duration: 0.4,
+          ease: [0.25, 0.1, 0.25, 1],
+        },
       }}
       onClick={(e) => {
         e.stopPropagation();
@@ -143,16 +157,11 @@ function ProjectCard({
         height: isExpanded ? undefined : "clamp(140px, 26vh, 260px)",
         minWidth: 0,
         minHeight: 0,
-        willChange: "transform",
       }}
     >
       {/* Active ring indicator */}
       {isExpanded && isActive && (
-        <motion.div
-          layoutId="active-indicator"
-          className="absolute inset-0 rounded-lg ring-2 ring-inset ring-secondary/60 pointer-events-none z-10"
-          transition={{ type: "tween", duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-        />
+        <div className="absolute inset-0 rounded-lg ring-2 ring-inset ring-secondary/60 pointer-events-none z-10" />
       )}
 
       <div
@@ -181,8 +190,11 @@ function ProjectCard({
               src={project.thumbnailUrl}
               alt={project.title}
               fill
-              sizes="300px"
+              sizes="(max-width: 768px) 50vw, 300px"
+              priority={isFirst}
+              unoptimized
               className="object-cover"
+              style={hotspotPosition(project.thumbnailHotspot)}
             />
           ) : (
             <div className="absolute inset-0 flex flex-col gap-1.5 p-3 opacity-40">
@@ -249,7 +261,14 @@ function ProjectCard({
 
 /* ── Detail panel (right side when expanded) ── */
 
+function hotspotPosition(hotspot?: { x: number; y: number }) {
+  if (!hotspot) return undefined;
+  return { objectPosition: `${hotspot.x * 100}% ${hotspot.y * 100}%` };
+}
+
 function DetailPanel({ project }: { project: Project }) {
+  const detailHotspot = project.coverUrl ? project.coverHotspot : project.thumbnailHotspot;
+
   return (
     <motion.div
       key={project.title}
@@ -264,15 +283,17 @@ function DetailPanel({ project }: { project: Project }) {
         className={`w-full rounded-lg relative overflow-hidden ${
           (project.coverUrl || project.thumbnailUrl) ? "" : `bg-linear-to-br ${project.accent}`
         }`}
-        style={{ minHeight: 120, flexShrink: 0, aspectRatio: "1200/630" }}
+        style={{ minHeight: 120, maxHeight: "70%", aspectRatio: "2400/1260" }}
       >
         {(project.coverUrl || project.thumbnailUrl) ? (
           <Image
             src={project.coverUrl || project.thumbnailUrl!}
             alt={project.title}
             fill
-            sizes="(max-width: 768px) 100vw, 60vw"
+            sizes="(max-width: 768px) 50vw, 40vw"
+            unoptimized
             className="object-cover"
+            style={hotspotPosition(detailHotspot)}
           />
         ) : (
         <div className="absolute inset-0 opacity-20 flex flex-col gap-3 p-5">
@@ -361,8 +382,8 @@ export default function Projects({
   const [focused, setFocused] = useState<string>(projectList[0].title);
   const [showDetail, setShowDetail] = useState(false);
 
-  // Expand: delay detail panel so cards snake first
-  // Collapse: everything fires at once — one unified motion
+  // Expand: delay detail panel so cards settle first
+  // Collapse: immediate — AnimatePresence handles the exit animation
   useEffect(() => {
     if (isExpanded) {
       const timer = setTimeout(() => setShowDetail(true), 500);
@@ -372,11 +393,10 @@ export default function Projects({
     }
   }, [isExpanded]);
 
-  // Reset focused after collapse animation finishes
+  // Reset focused immediately on close so no mid-animation re-render
   useEffect(() => {
     if (!isExpanded) {
-      const timer = setTimeout(() => setFocused(projectList[0].title), 450);
-      return () => clearTimeout(timer);
+      setFocused(projectList[0].title);
     }
   }, [isExpanded]);
 
@@ -402,6 +422,7 @@ export default function Projects({
         flexShrink: 0,
         flexBasis: 0,
         transition: `flex-grow ${dur} ${cubic}`,
+        contain: "layout style",
       }}
       className="w-full bg-foreground/70 backdrop-blur-sm border border-secondary/30 shadow-lg rounded-sm flex items-center justify-center relative cursor-pointer overflow-hidden"
     >
@@ -445,13 +466,14 @@ export default function Projects({
             }
             style={{ width: isExpanded ? 300 : undefined }}
           >
-            {projectList.map((project) => (
+            {projectList.map((project, i) => (
               <ProjectCard
                 key={project.title}
                 project={project}
                 isExpanded={isExpanded}
                 isActive={focused === project.title}
                 totalCount={projectList.length}
+                isFirst={i === 0}
                 onClick={() => handleCardClick(project.title)}
               />
             ))}

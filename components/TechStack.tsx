@@ -213,7 +213,7 @@ function SkillCard({
 
 /* ── Main component ── */
 
-const flexTransition = "flex-grow 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)";
+
 
 interface TechStackProps {
   isExpanded: boolean;
@@ -305,7 +305,7 @@ export default function TechStack({
         flexGrow: flex,
         flexShrink: 0,
         flexBasis: 0,
-        transition: flexTransition,
+        transition: "flex-grow 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)",
       }}
       className={`h-full bg-foreground/70 backdrop-blur-xl border border-secondary/30 shadow-lg rounded-sm flex flex-col relative cursor-pointer overflow-hidden
         ${isCollapsed ? "opacity-90 hover:opacity-100" : ""}
@@ -397,6 +397,32 @@ export default function TechStack({
               />
             ))}
           </div>
+          {/* Tech skill detail */}
+          <AnimatePresence>
+            {isExpanded && (() => {
+              const item = activeSkill ? techStack.find((i) => i.label === activeSkill) : null;
+              if (!item) return null;
+              return (
+                <motion.div
+                  key={item.label}
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto", transition: { height: { duration: 0.25, ease }, opacity: { duration: 0.2, delay: 0.08, ease } } }}
+                  exit={{ opacity: 0, height: 0, transition: { opacity: { duration: 0.1 }, height: { duration: 0.15, delay: 0.05, ease } } }}
+                  className="rounded-lg border border-l-2 shadow-lg bg-secondary border-secondary/40 border-l-white/25 overflow-hidden"
+                >
+                  <div className="px-5 py-4">
+                    <div className="flex items-center gap-2 mb-2.5">
+                      <span className="text-lg text-white/60">{item.icon}</span>
+                      <span className="text-xs font-semibold uppercase tracking-wider text-white/90">{item.label}</span>
+                    </div>
+                    <p className="text-xs leading-relaxed font-light text-white/70">
+                      {item.detail}
+                    </p>
+                  </div>
+                </motion.div>
+              );
+            })()}
+          </AnimatePresence>
         </div>
 
         {/* Beyond Code */}
@@ -438,6 +464,32 @@ export default function TechStack({
               />
             ))}
           </div>
+          {/* Beyond code skill detail */}
+          <AnimatePresence>
+            {isExpanded && (() => {
+              const item = activeSkill ? otherSkills.find((i) => i.label === activeSkill) : null;
+              if (!item) return null;
+              return (
+                <motion.div
+                  key={item.label}
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto", transition: { height: { duration: 0.25, ease }, opacity: { duration: 0.2, delay: 0.08, ease } } }}
+                  exit={{ opacity: 0, height: 0, transition: { opacity: { duration: 0.1 }, height: { duration: 0.15, delay: 0.05, ease } } }}
+                  className="rounded-lg border border-l-2 shadow-lg bg-background/90 border-secondary/15 border-l-secondary overflow-hidden"
+                >
+                  <div className="px-5 py-4">
+                    <div className="flex items-center gap-2 mb-2.5">
+                      <span className="text-lg text-secondary">{item.icon}</span>
+                      <span className="text-xs font-semibold uppercase tracking-wider text-text/80">{item.label}</span>
+                    </div>
+                    <p className="text-xs leading-relaxed font-light text-text/70">
+                      {item.detail}
+                    </p>
+                  </div>
+                </motion.div>
+              );
+            })()}
+          </AnimatePresence>
         </div>
       </div>
 
@@ -525,7 +577,7 @@ export default function TechStack({
         </div>
       </div>
 
-      {/* Timeline — no height animation; container's flex transition + overflow-hidden handles reveal */}
+      {/* Timeline */}
       {isExpanded && (
         <div className="w-full px-8 pb-6 shrink-0">
           <h3 className="font-semibold uppercase tracking-wider text-secondary text-xs mb-1">
@@ -534,39 +586,6 @@ export default function TechStack({
           <Timeline items={milestones} />
         </div>
       )}
-      {/* Skill detail — absolutely positioned so it never affects layout flow */}
-      {isExpanded && (() => {
-        const item = activeSkill
-          ? techStack.find((i) => i.label === activeSkill) ?? otherSkills.find((i) => i.label === activeSkill)
-          : null;
-        const isTech = item ? techStack.some((i) => i.label === item.label) : false;
-        return (
-          <AnimatePresence mode="wait">
-            {item && (
-              <motion.div
-                key={item.label}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.18, ease }}
-                className={`absolute left-8 right-8 bottom-20 z-20 rounded-lg border border-l-2 px-5 py-4 shadow-lg ${
-                  isTech
-                    ? "bg-secondary border-secondary/40 border-l-white/25"
-                    : "bg-background/90 border-secondary/15 border-l-secondary"
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-2.5">
-                  <span className={`text-lg ${isTech ? "text-white/60" : "text-secondary"}`}>{item.icon}</span>
-                  <span className={`text-xs font-semibold uppercase tracking-wider ${isTech ? "text-white/90" : "text-text/80"}`}>{item.label}</span>
-                </div>
-                <p className={`text-xs leading-relaxed font-light ${isTech ? "text-white/70" : "text-text/70"}`}>
-                  {item.detail}
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        );
-      })()}
     </motion.section>
   );
 }
